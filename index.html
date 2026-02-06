@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timer - 任務計時器</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/pages.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+
+<body>
+    <!-- 主容器 -->
+    <div id="app">
+        <!-- 首頁 -->
+        <div id="home-page" class="page active">
+            <!-- 頂部導航 -->
+            <header class="top-nav">
+                <h1 class="app-title">timer</h1>
+                <div class="nav-icons">
+                    <button class="icon-btn" id="list-btn" aria-label="列表">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="add-btn" aria-label="新增">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="settings-btn" aria-label="設定">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M12 1v6m0 6v6m5.2-14.2l-4.2 4.2m0 6l-4.2 4.2M1 12h6m6 0h6m-14.2 5.2l4.2-4.2m0-6l4.2-4.2">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 主要內容 -->
+            <main class="home-main">
+                <!-- 日期 -->
+                <div class="date-display" id="home-date">2026. 02. 06. Fri</div>
+
+                <!-- 光暈容器 -->
+                <div class="glow-container" id="glow-container">
+                    <div class="glow-circle">
+                        <!-- 累計時間 -->
+                        <div class="total-time" id="total-time">00:00:00</div>
+
+                        <!-- Task 資訊 -->
+                        <div class="task-info" id="task-info">
+                            <div class="task-selector">
+                                <span class="task-color-dot" id="task-color"></span>
+                                <span class="task-name" id="task-name">請選擇任務</span>
+                            </div>
+                            <div class="task-time" id="task-time">00:00:00</div>
+                        </div>
+                    </div>
+
+                    <!-- 光暈芒刺 -->
+                    <div class="glow-rays" id="glow-rays"></div>
+                </div>
+
+                <!-- START 按鈕 -->
+                <button class="start-btn" id="start-btn">START ▶</button>
+            </main>
+
+            <!-- 底部導航 -->
+            <nav class="bottom-nav">
+                <button class="nav-btn active" data-page="home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>計時</span>
+                </button>
+                <button class="nav-btn" data-page="records">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span>記錄</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- 計時進行中頁面 -->
+        <div id="timer-running-page" class="page">
+            <div class="timer-running-container">
+                <div class="running-task-info">
+                    <span class="task-color-bar" id="running-task-color"></span>
+                    <span class="task-name" id="running-task-name">Studying</span>
+                </div>
+
+                <div class="running-timer" id="running-timer">00:00:00</div>
+
+                <div class="timer-warning">無法儲存15秒以下的記錄。</div>
+
+                <button class="cancel-btn" id="stop-timer-btn">不用了</button>
+            </div>
+        </div>
+
+        <!-- 記錄頁面 -->
+        <div id="records-page" class="page">
+            <header class="top-nav">
+                <h1 class="app-title">計畫及記錄</h1>
+                <div class="nav-icons">
+                    <button class="icon-btn" id="records-list-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="records-add-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button class="icon-btn" id="records-settings-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <main class="records-main">
+                <!-- 日期導航 -->
+                <div class="date-nav">
+                    <button class="date-nav-btn" id="prev-date">&lt;</button>
+                    <div class="date-display" id="records-date">2026. 02. 06. Thu</div>
+                    <button class="date-nav-btn" id="next-date">&gt;</button>
+                </div>
+                <div class="daily-total" id="daily-total">0h 00m</div>
+
+                <!-- Tasks 列表 -->
+                <div class="tasks-list" id="tasks-list">
+                    <!-- 動態生成 -->
+                </div>
+
+                <!-- RECORD 時間軸 -->
+                <div class="record-section">
+                    <div class="record-header">
+                        <span>RECORD</span>
+                        <span class="record-total" id="record-total">0h 00m</span>
+                    </div>
+                    <div class="timeline-container" id="timeline-container">
+                        <!-- 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 操作按鈕 -->
+                <div class="record-actions">
+                    <button class="action-btn" id="add-record-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2"></line>
+                            <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2"></line>
+                        </svg>
+                        <span>添加紀錄</span>
+                    </button>
+                    <button class="action-btn" id="edit-record-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        <span>編輯紀錄</span>
+                    </button>
+                    <button class="action-btn" id="delete-record-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                            </path>
+                        </svg>
+                        <span>刪除紀錄</span>
+                    </button>
+                </div>
+            </main>
+
+            <!-- 底部導航 -->
+            <nav class="bottom-nav">
+                <button class="nav-btn" data-page="home">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>計時</span>
+                </button>
+                <button class="nav-btn active" data-page="records">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                    <span>記錄</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- 新增 Task 頁面 -->
+        <div id="add-task-page" class="page">
+            <header class="top-nav">
+                <button class="back-btn" id="back-from-add-task">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <h1 class="page-title">新增待辦事項</h1>
+            </header>
+
+            <main class="add-task-main">
+                <input type="text" class="task-input" id="task-name-input" placeholder="請輸入標題。">
+
+                <div class="color-section">
+                    <h3>顏色</h3>
+                    <div class="color-grid" id="color-grid">
+                        <!-- 動態生成顏色選擇器 -->
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="action-btn secondary" id="cancel-add-task">取消</button>
+                    <button class="action-btn primary" id="save-task">儲存</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- 設定頁面 -->
+        <div id="settings-page" class="page">
+            <header class="top-nav">
+                <button class="back-btn" id="back-from-settings">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <h1 class="page-title">設定</h1>
+            </header>
+
+            <main class="settings-main">
+                <div class="settings-section">
+                    <h3>任務管理</h3>
+                    <div class="settings-tasks-list" id="settings-tasks-list">
+                        <!-- 動態生成 -->
+                    </div>
+                    <button class="action-btn primary full-width" id="add-task-from-settings">+ 新增任務</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- 全部記錄頁面 -->
+        <div id="all-records-page" class="page">
+            <header class="top-nav">
+                <button class="back-btn" id="back-from-all-records">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <h1 class="page-title">全部記錄</h1>
+            </header>
+
+            <main class="all-records-main">
+                <!-- 月份導航 -->
+                <div class="month-nav">
+                    <button class="date-nav-btn" id="prev-month">&lt;</button>
+                    <div class="month-display" id="month-display">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span id="current-month">2026年2月</span>
+                    </div>
+                    <button class="date-nav-btn" id="next-month">&gt;</button>
+                </div>
+
+                <!-- 記錄列表 -->
+                <div class="all-records-list" id="all-records-list">
+                    <!-- 動態生成 -->
+                </div>
+
+                <!-- 刪除按鈕 -->
+                <button class="action-btn danger full-width" id="delete-selected-records"
+                    style="display: none;">刪除選中的記錄</button>
+            </main>
+        </div>
+    </div>
+
+    <!-- Task 選擇對話框 -->
+    <div class="modal" id="task-selector-modal">
+        <div class="modal-content slide-up">
+            <div class="modal-header">
+                <button class="icon-btn modal-add-btn" id="modal-add-task">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-tasks-list" id="modal-tasks-list">
+                <!-- 動態生成 -->
+            </div>
+            <button class="modal-cancel-btn" id="close-task-selector">取消</button>
+        </div>
+    </div>
+
+    <!-- 記錄編輯對話框 -->
+    <div class="modal" id="record-edit-modal">
+        <div class="modal-content">
+            <div class="error-message" id="record-error" style="display: none;"></div>
+
+            <h3 class="modal-title" id="record-modal-title">記錄選擇</h3>
+
+            <div class="record-task-display" id="record-task-display">
+                <span class="task-color-dot" id="record-task-color"></span>
+                <span id="record-task-name">Studying</span>
+            </div>
+
+            <div class="time-input-section">
+                <h4>設定時間</h4>
+                <div class="time-inputs">
+                    <input type="number" class="time-input" id="start-hour" min="0" max="23" placeholder="00">
+                    <span>:</span>
+                    <input type="number" class="time-input" id="start-minute" min="0" max="59" placeholder="00">
+                    <span class="time-separator">~</span>
+                    <input type="number" class="time-input" id="end-hour" min="0" max="23" placeholder="00">
+                    <span>:</span>
+                    <input type="number" class="time-input" id="end-minute" min="0" max="59" placeholder="00">
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="action-btn secondary" id="cancel-record-edit">取消</button>
+                <button class="action-btn primary" id="save-record-edit">編輯</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 確認對話框 -->
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="confirm-title">確認</h3>
+            <p class="confirm-message" id="confirm-message"></p>
+            <div class="modal-actions">
+                <button class="action-btn secondary" id="confirm-cancel">取消</button>
+                <button class="action-btn danger" id="confirm-ok">確定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>

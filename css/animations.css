@@ -1,0 +1,287 @@
+/* 動畫效果 */
+
+/* 光暈旋轉動畫 */
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+.glow-rays {
+    animation: rotate 60s linear infinite;
+}
+
+/* 光暈芒刺呼吸動畫 */
+@keyframes breathe {
+
+    0%,
+    100% {
+        transform: translate(-50%, 0) scaleY(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translate(-50%, 0) scaleY(1.3);
+        opacity: 0.8;
+    }
+}
+
+.glow-ray {
+    animation: breathe 3s ease-in-out infinite;
+}
+
+/* 對話框滑入動畫 */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+.modal.closing .modal-content.slide-up {
+    animation: slideDown var(--transition-normal);
+}
+
+/* 淡入淡出 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-normal);
+}
+
+.fade-out {
+    animation: fadeOut var(--transition-normal);
+}
+
+/* 脈衝動畫（用於計時中的視覺回饋） */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* 彈跳動畫 */
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.bounce {
+    animation: bounce 1s ease-in-out infinite;
+}
+
+/* 搖晃動畫（用於錯誤提示） */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* 載入動畫 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 頁面過渡動畫 */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+.page.slide-in-right {
+    animation: slideInRight var(--transition-normal);
+}
+
+.page.slide-out-left {
+    animation: slideOutLeft var(--transition-normal);
+}
+
+/* 縮放動畫 */
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+}
+
+.scale-in {
+    animation: scaleIn var(--transition-fast);
+}
+
+.scale-out {
+    animation: scaleOut var(--transition-fast);
+}
+
+/* 時間數字翻轉動畫 */
+@keyframes flipNumber {
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    50% {
+        transform: rotateX(90deg);
+    }
+
+    100% {
+        transform: rotateX(0deg);
+    }
+}
+
+.flip-number {
+    animation: flipNumber 0.3s ease-in-out;
+}
+
+/* Hover 光暈效果 */
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px var(--accent-color);
+    }
+
+    50% {
+        box-shadow: 0 0 20px var(--accent-color);
+    }
+}
+
+.glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* 進度條動畫 */
+@keyframes progress {
+    from {
+        width: 0%;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.progress-bar {
+    animation: progress 1s ease-out;
+}

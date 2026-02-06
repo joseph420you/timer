@@ -1,0 +1,87 @@
+/* CSS 變數定義 */
+:root {
+    /* 顏色系統 */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2a2a2a;
+    --bg-tertiary: #3a3a3a;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --text-tertiary: #808080;
+    
+    --accent-color: #3B82F6;
+    --success-color: #10B981;
+    --warning-color: #F59E0B;
+    --error-color: #EF4444;
+    
+    /* Task 預設顏色 */
+    --color-1: #A855F7; /* 紫色 */
+    --color-2: #EC4899; /* 粉色 */
+    --color-3: #F43F5E; /* 玫紅 */
+    --color-4: #EF4444; /* 紅色 */
+    --color-5: #F97316; /* 深橘 */
+    --color-6: #F59E0B; /* 橘色 */
+    --color-7: #FACC15; /* 金黃 */
+    --color-8: #EAB308; /* 黃色 */
+    --color-9: #84CC16; /* 萊姆綠 */
+    --color-10: #22C55E; /* 綠色 */
+    --color-11: #10B981; /* 碧綠 */
+    --color-12: #14B8A6; /* 青綠 */
+    --color-13: #06B6D4; /* 青色 */
+    --color-14: #0EA5E9; /* 天藍 */
+    --color-15: #3B82F6; /* 藍色 */
+    --color-16: #6366F1; /* 靛藍 */
+    --color-17: #8B5CF6; /* 紫羅蘭 */
+    --color-18: #A855F7; /* 紫色 */
+    --color-19: #D946EF; /* 品紅 */
+    --color-20: #EC4899; /* 粉紅 */
+    
+    /* 間距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+    
+    /* 字體大小 */
+    --font-xs: 12px;
+    --font-sm: 14px;
+    --font-md: 16px;
+    --font-lg: 18px;
+    --font-xl: 24px;
+    --font-2xl: 32px;
+    --font-3xl: 48px;
+    --font-4xl: 64px;
+    
+    /* 圓角 */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+    
+    /* 陰影 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.3);
+    
+    /* 過渡動畫 */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+    --transition-slow: 500ms ease;
+    
+    /* Z-index 層級 */
+    --z-base: 1;
+    --z-dropdown: 10;
+    --z-sticky: 100;
+    --z-overlay: 1000;
+    --z-modal: 2000;
+    --z-toast: 3000;
+    
+    /* 響應式斷點（僅供參考，實際使用 @media） */
+    --breakpoint-mobile: 320px;
+    --breakpoint-tablet: 768px;
+    --breakpoint-desktop: 1024px;
+}
