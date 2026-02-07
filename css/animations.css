@@ -1,7 +1,7 @@
 /* 動畫效果 */
 
-/* 光暈旋轉動畫 */
-@keyframes rotate {
+/* 光暈旋轉動畫 - 慢速旋轉 */
+@keyframes glowRotate {
     from {
         transform: translate(-50%, -50%) rotate(0deg);
     }
@@ -11,28 +11,22 @@
     }
 }
 
-.glow-rays {
-    animation: rotate 60s linear infinite;
-}
+/* glow-rays 的動畫已在 pages.css 中設定 */
 
-/* 光暈芒刺呼吸動畫 */
-@keyframes breathe {
+/* 光暈芒刺透明度動畫 - 不使用 transform 避免覆蓋位置 */
+@keyframes rayPulse {
 
     0%,
     100% {
-        transform: translate(-50%, 0) scaleY(1);
-        opacity: 0.6;
+        opacity: 0.5;
     }
 
     50% {
-        transform: translate(-50%, 0) scaleY(1.3);
-        opacity: 0.8;
+        opacity: 0.9;
     }
 }
 
-.glow-ray {
-    animation: breathe 3s ease-in-out infinite;
-}
+/* 移除呼吸動畫，只保留透明度變化 */
 
 /* 對話框滑入動畫 */
 @keyframes slideUp {
@@ -284,4 +278,39 @@
 
 .progress-bar {
     animation: progress 1s ease-out;
+}
+
+/* 光暈芒刺閃爍動畫 - 縮放長度與透明度 */
+/* 動態光暈旋轉動畫 */
+@keyframes rotateGlow {
+    from {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* 變形 Blob 動畫 - 用於製造迷幻煙霧感 */
+@keyframes blobSpin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg) scale(1);
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    }
+
+    33% {
+        transform: translate(-50%, -50%) rotate(120deg) scale(1.1);
+        border-radius: 70% 30% 50% 50% / 30% 30% 70% 70%;
+    }
+
+    66% {
+        transform: translate(-50%, -50%) rotate(240deg) scale(0.95);
+        border-radius: 100% 60% 60% 100% / 100% 100% 60% 60%;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg) scale(1);
+        border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    }
 }

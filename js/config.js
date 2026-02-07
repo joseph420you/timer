@@ -1,17 +1,17 @@
 // Firebase 配置
-// 請將此處的 PLACEHOLDER 替換為您的 Firebase 配置
+// Firebase 配置
 
-export const firebaseConfig = {
-    apiKey: "PLACEHOLDER",
-    authDomain: "PLACEHOLDER",
-    projectId: "PLACEHOLDER",
-    storageBucket: "PLACEHOLDER",
-    messagingSenderId: "PLACEHOLDER",
-    appId: "PLACEHOLDER"
+window.firebaseConfig = {
+    apiKey: "AIzaSyDDXMeDjzXckCbQva5GSNShttOv5tkQkAU",
+    authDomain: "gen-lang-client-0975025233.firebaseapp.com",
+    projectId: "gen-lang-client-0975025233",
+    storageBucket: "gen-lang-client-0975025233.firebasestorage.app",
+    messagingSenderId: "505353666884",
+    appId: "1:505353666884:web:25044ccf7c34bef865d711"
 };
 
 // 預設 Tasks 顏色
-export const DEFAULT_COLORS = [
+window.DEFAULT_COLORS = [
     '#A855F7', // 紫色
     '#EC4899', // 粉色
     '#F43F5E', // 玫紅
@@ -35,16 +35,16 @@ export const DEFAULT_COLORS = [
 ];
 
 // 應用程式配置
-export const APP_CONFIG = {
+window.APP_CONFIG = {
     // 最小記錄時間（秒）
     MIN_RECORD_DURATION: 15,
-    
+
     // 光暈芒刺數量
     GLOW_RAYS_COUNT: 24,
-    
+
     // 時間軸小時範圍
     TIMELINE_HOURS: 24,
-    
+
     // LocalStorage 鍵名
     STORAGE_KEYS: {
         TASKS: 'timer_tasks',

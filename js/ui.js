@@ -168,6 +168,7 @@ class UI {
                 }
             });
         });
+
     }
 
     // 顯示頁面
@@ -253,12 +254,25 @@ class UI {
             ray.className = 'glow-ray';
 
             const angle = (360 / count) * i;
-            const length = 20 + Math.random() * 30; // 20-50px
-            const delay = Math.random() * 3; // 0-3s
+            // Base length: 20-30px
+            const length = 20 + Math.random() * 10;
+
+            // Random duration: 1.5s - 4s (slower breathing)
+            const duration = 1.5 + Math.random() * 2.5;
+
+            const delay = Math.random() * 2;
+
+            // Random scale target for shrinking effect (0.3 - 0.7)
+            const scaleTarget = 0.3 + Math.random() * 0.4;
 
             ray.style.height = `${length}px`;
-            ray.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateY(-150px)`;
-            ray.style.animationDelay = `${delay}s`;
+
+            // Set CSS variables for animation
+            ray.style.setProperty('--angle', `${angle}deg`);
+            ray.style.setProperty('--offset', '-153px'); // Adjusted for perfect alignment
+            ray.style.setProperty('--duration', `${duration}s`);
+            ray.style.setProperty('--delay', `${delay}s`);
+            ray.style.setProperty('--scale-target', scaleTarget);
 
             raysContainer.appendChild(ray);
         }
@@ -661,6 +675,7 @@ class UI {
             this.updateAllRecordsPage();
         }
     }
+
 }
 
 // 導出單例

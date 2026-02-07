@@ -1,5 +1,93 @@
 /* 各頁面專屬樣式 */
 
+/* ========== 登入頁面 ========== */
+.login-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, #1a1a2e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.login-page.hidden {
+    display: none;
+}
+
+.login-container {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    max-width: 400px;
+    width: 90%;
+}
+
+.login-logo {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.login-icon {
+    font-size: 64px;
+    margin-bottom: var(--spacing-md);
+    animation: loginPulse 2s ease-in-out infinite;
+}
+
+@keyframes loginPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.login-title {
+    font-size: 48px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    margin-bottom: var(--spacing-sm);
+    background: linear-gradient(135deg, #fff 0%, #888 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.login-subtitle {
+    font-size: var(--font-md);
+    color: var(--text-tertiary);
+    letter-spacing: 2px;
+}
+
+.login-content {
+    margin-top: var(--spacing-2xl);
+}
+
+.login-hint {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
+.login-google-btn {
+    padding: var(--spacing-md) var(--spacing-xl);
+    font-size: var(--font-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all var(--transition-fast);
+}
+
+.login-google-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+}
+
 /* ========== 首頁 ========== */
 .home-main {
     flex: 1;
@@ -7,48 +95,73 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-xl) var(--spacing-lg);
-    padding-bottom: calc(80px + var(--spacing-xl));
+    padding: var(--spacing-lg) var(--spacing-lg);
+    padding-bottom: calc(80px + var(--spacing-lg));
     /* 底部導航高度 */
-    gap: var(--spacing-2xl);
+    gap: var(--spacing-lg);
 }
 
-.home-main .date-display {
-    font-size: var(--font-sm);
-    margin-bottom: -var(--spacing-lg);
+/* 首頁日期顯示 - 在圓形上方 */
+/* 首頁日期顯示 - 在圓形上方 */
+.home-date {
+    font-size: 24px !important;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-sm) !important;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
 
 /* 光暈容器 */
 .glow-container {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
     aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-top: 50px;
 }
 
+/* 光暈圓圈效果 */
 .glow-circle {
     position: relative;
-    width: 80%;
+    width: 85%;
     aspect-ratio: 1;
     border-radius: var(--radius-full);
-    background: radial-gradient(circle, rgba(26, 26, 26, 0.9) 0%, rgba(26, 26, 26, 0.5) 70%, transparent 100%);
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: radial-gradient(circle, rgba(26, 26, 26, 0.95) 0%, rgba(26, 26, 26, 0.7) 60%, transparent 100%);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-sm);
     z-index: 2;
+    /* 光暈發光效果 */
+    box-shadow:
+        0 0 30px rgba(34, 197, 94, 0.3),
+        0 0 60px rgba(34, 197, 94, 0.2),
+        0 0 100px rgba(34, 197, 94, 0.1),
+        inset 0 0 30px rgba(34, 197, 94, 0.05);
+}
+
+.home-date {
+    font-size: clamp(12px, 3vw, 14px);
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    margin-top: clamp(60px, 20%, 100px);
 }
 
 .total-time {
-    font-size: var(--font-4xl);
+    font-size: clamp(40px, 12vw, 64px);
     font-weight: 300;
     letter-spacing: 2px;
     line-height: 1;
+    margin-top: clamp(8px, 2%, 16px);
 }
 
 .task-info {
@@ -56,6 +169,7 @@
     flex-direction: column;
     align-items: center;
     gap: var(--spacing-sm);
+    margin-top: clamp(10px, 4%, 30px);
 }
 
 .task-selector {
@@ -66,6 +180,8 @@
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--radius-full);
     transition: background-color var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 .task-selector:hover {
@@ -73,16 +189,16 @@
 }
 
 .task-name {
-    font-size: var(--font-md);
+    font-size: clamp(14px, 4vw, 18px);
     color: var(--text-primary);
 }
 
 .task-time {
-    font-size: var(--font-sm);
+    font-size: clamp(12px, 3vw, 14px);
     color: var(--text-secondary);
 }
 
-/* 光暈芒刺 */
+/* 光暈芒刺容器 - 帶旋轉動畫 */
 .glow-rays {
     position: absolute;
     top: 50%;
@@ -91,15 +207,46 @@
     height: 100%;
     transform: translate(-50%, -50%);
     z-index: 1;
+    animation: glowRotate 120s linear infinite;
 }
 
-.glow-ray {
+/* 光暈芒刺 - 永久顯示 */
+/* 動態漸層光芒效果 */
+.glow-circle::before,
+.glow-circle::after {
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 2px;
-    transform-origin: center;
-    opacity: 0.6;
+    width: 160%;
+    height: 160%;
+    transform: translate(-50%, -50%);
+    background:
+        radial-gradient(ellipse 80% 50% at 30% 20%, var(--accent-color) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 80% at 70% 80%, var(--accent-color) 0%, transparent 45%),
+        radial-gradient(ellipse 50% 60% at 20% 70%, var(--accent-color) 0%, transparent 40%);
+    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+    z-index: -1;
+    opacity: 0.4;
+    filter: blur(60px);
+    animation: blobSpin 12s ease-in-out infinite;
+}
+
+.glow-circle::after {
+    width: 180%;
+    height: 180%;
+    background:
+        radial-gradient(ellipse 70% 40% at 60% 30%, var(--accent-color) 0%, transparent 45%),
+        radial-gradient(ellipse 40% 70% at 40% 60%, var(--accent-color) 0%, transparent 40%),
+        radial-gradient(ellipse 60% 50% at 80% 50%, var(--accent-color) 0%, transparent 35%);
+    opacity: 0.3;
+    filter: blur(70px);
+    animation: blobSpin 16s ease-in-out infinite reverse;
+}
+
+/* 光暈芒刺 - 已移除 */
+.glow-ray {
+    display: none;
 }
 
 /* START 按鈕 */
@@ -213,6 +360,8 @@
 .record-section {
     flex: 1;
     padding: var(--spacing-lg);
+    padding-bottom: 160px;
+    /* 為固定操作按鈕和底部導航留空間 */
     overflow-y: auto;
 }
 
@@ -240,14 +389,15 @@
     position: absolute;
     left: 0;
     top: 0;
-    bottom: 0;
     width: 40px;
     display: flex;
     flex-direction: column;
+    height: calc(24 * 40px);
 }
 
 .timeline-hour {
-    flex: 1;
+    height: 40px;
+    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -539,6 +689,66 @@
     margin-top: var(--spacing-xs);
 }
 
+/* ========== 帳戶區塊 ========== */
+.account-info {
+    background-color: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.account-hint {
+    font-size: var(--font-sm);
+    color: var(--text-tertiary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.google-login-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    background-color: white;
+    color: #333;
+    font-weight: 500;
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.google-login-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    background-color: var(--bg-secondary);
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-size: var(--font-md);
+    font-weight: 500;
+}
+
+.user-email {
+    font-size: var(--font-sm);
+    color: var(--text-tertiary);
+    margin-top: var(--spacing-xs);
+}
+
 /* ========== 記錄編輯對話框 ========== */
 .record-task-display {
     display: flex;
@@ -605,6 +815,52 @@
 
     .color-grid {
         grid-template-columns: repeat(10, 1fr);
+    }
+
+    /* 桌面版 - 日期字體加大 */
+    .home-date {
+        font-size: var(--font-xl) !important;
+    }
+
+    /* 桌面版 - 任務名稱加大 */
+    .task-name {
+        font-size: var(--font-xl);
+    }
+
+    .task-time {
+        font-size: var(--font-md);
+    }
+
+    /* 桌面版 - 任務選擇器加大 */
+    .task-selector {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    /* 桌面版 - 模態對話框內的任務名稱加大 */
+    .modal-task-name {
+        font-size: var(--font-lg);
+    }
+
+    .modal-task-time {
+        font-size: var(--font-md);
+    }
+
+    /* 桌面版 - 記錄頁面任務項目 */
+    .task-item-name {
+        font-size: var(--font-lg);
+    }
+
+    .task-item-time {
+        font-size: var(--font-md);
+    }
+
+    /* 桌面版 - 設定頁面任務名稱 */
+    .settings-task-name {
+        font-size: var(--font-lg);
+    }
+
+    .side-panel-task-name {
+        font-size: var(--font-lg);
     }
 }
 
