@@ -28,6 +28,10 @@ function generateId() {
     });
 }
 
+function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
 function getTodayDate() {
     return formatDate(new Date());
 }
@@ -165,9 +169,27 @@ const Storage = {
 
     // 取得 Tasks 配置
     getTasksConfig() {
-        if (this._tasksConfig) return this._tasksConfig;
-        const configJson = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.TASKS);
-        return configJson ? JSON.parse(configJson) : { items: [] };
+        if (this._tasksConfig && this._tasksConfig.items) return this._tasksConfig;
+
+        let config = { items: [] };
+        try {
+            const configJson = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.TASKS);
+            if (configJson) {
+                const parsed = JSON.parse(configJson);
+                if (parsed && Array.isArray(parsed.items)) {
+                    config = parsed;
+                }
+            }
+        } catch (e) {
+            console.error('Error parsing tasks config:', e);
+        }
+
+        // Update cache if needed
+        if (!this._tasksConfig) {
+            this._tasksConfig = config;
+        }
+
+        return config;
     },
 
     saveTasksConfig(config) {
@@ -178,13 +200,13 @@ const Storage = {
     // 取得活躍的 Tasks（排除已刪除）
     getTasks() {
         const config = this.getTasksConfig();
-        return config.items.filter(task => !task.isDeleted);
+        return (config.items || []).filter(task => !task.isDeleted);
     },
 
     // 取得所有 Tasks（包含已刪除，用於顯示歷史記錄）
     getAllTasks() {
         const config = this.getTasksConfig();
-        return config.items;
+        return config.items || [];
     },
 
     getTask(taskId) {
@@ -422,6 +444,7 @@ Storage.init();
 const Timer = {
     startTime: null,
     taskId: null,
+    sessionId: null,  // NEW: Session ID for cross-device conflict detection
     intervalId: null,
     isRunning: false,
     onTick: null,
@@ -432,19 +455,26 @@ const Timer = {
         if (state) {
             this.startTime = state.startTime;
             this.taskId = state.taskId;
+            this.sessionId = state.sessionId;  // Restore sessionId
             this.start();
         }
     },
 
     start(taskId = null) {
-        if (this.isRunning) return;
+        console.log('Timer.start called with taskId:', taskId, 'isRunning:', this.isRunning);
+        if (this.isRunning) {
+            console.warn('⚠️ Timer is already running, ignoring start request');
+            return;
+        }
 
         if (taskId) {
             this.startTime = Date.now();
             this.taskId = taskId;
+            this.sessionId = generateSessionId();  // Generate new sessionId
             Storage.saveTimerState({
                 startTime: this.startTime,
-                taskId: this.taskId
+                taskId: this.taskId,
+                sessionId: this.sessionId  // Save sessionId
             });
         }
 
@@ -462,7 +492,7 @@ const Timer = {
         }
     },
 
-    stop(shouldSave = true) {
+    async stop(shouldSave = true) {
         if (!this.isRunning) return null;
 
         clearInterval(this.intervalId);
@@ -472,9 +502,33 @@ const Timer = {
         const duration = Math.floor((endTime - this.startTime) / 1000);
 
         let record = null;
+        let isValid = true;
 
+        // Validate sessionId if online
         if (shouldSave && duration >= APP_CONFIG.MIN_RECORD_DURATION) {
-            record = Storage.addRecord(this.taskId, this.startTime, endTime);
+            if (Storage.isOnline()) {
+                try {
+                    const cloudState = await FirestoreDB.getTimerState();
+
+                    // Check if sessionId matches
+                    if (cloudState && cloudState.sessionId !== this.sessionId) {
+                        console.warn('⚠️ SessionId mismatch: timer taken over by another device');
+                        isValid = false;
+
+                        // Show invalid record message
+                        alert('⚠️ 此計時記錄已失效\n\n偵測到計時已在其他裝置繼續，此次記錄將不會儲存。');
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Failed to validate sessionId, preserving record:', error);
+                    // Network failure: preserve record (優先保留記錄)
+                    isValid = true;
+                }
+            }
+
+            // Only save if valid
+            if (isValid) {
+                record = await Storage.addRecord(this.taskId, this.startTime, endTime);
+            }
         }
 
         this.reset();
@@ -483,12 +537,13 @@ const Timer = {
             this.onStop(record, duration);
         }
 
-        return { record, duration };
+        return { record, duration, isValid };
     },
 
     reset() {
         this.startTime = null;
         this.taskId = null;
+        this.sessionId = null;  // Clear sessionId
         this.intervalId = null;
         this.isRunning = false;
         Storage.clearTimerState();
@@ -523,6 +578,14 @@ const UI = {
             console.error('Firebase 未正確載入');
         }
 
+        // 計時中離開頁面警告
+        window.addEventListener('beforeunload', (e) => {
+            if (Timer.isRunning) {
+                e.preventDefault();
+                e.returnValue = '';  // Modern browsers show generic warning
+            }
+        });
+
         console.log('✅ Timer App 啟動完成！');
     },
 
@@ -530,6 +593,13 @@ const UI = {
         const loginBtn = document.getElementById('login-google-btn');
         if (loginBtn) {
             loginBtn.addEventListener('click', async () => {
+                // 檢查是否為 LINE 的內建瀏覽器
+                const ua = navigator.userAgent || navigator.vendor || window.opera;
+                if (/Line\//i.test(ua)) {
+                    alert('Google 登入不支援 LINE 內建瀏覽器。\n請點擊右上角選單，選擇「用預設瀏覽器開啟」或「Open in external browser」再嘗試登入。');
+                    return;
+                }
+
                 try {
                     loginBtn.disabled = true;
                     loginBtn.textContent = '登入中...';
@@ -595,12 +665,15 @@ const UI = {
     _initialized: false,
 
     initMainApp() {
+        console.log('🔄 initMainApp called. _initialized:', this._initialized);
         // 只在第一次初始化時綁定事件
         if (!this._initialized) {
             Storage.initializeSampleData();
+            Timer.restoreState(); // Restore timer state if exists
             this.setupEventListeners();
             this.renderGlowRays();
             this._initialized = true;
+            console.log('✅ UI Initialized');
         }
 
         // 每次登入都更新這些
@@ -688,9 +761,13 @@ const UI = {
         // START 按鈕
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
-            startBtn.addEventListener('click', () => {
+            console.log('✅ Found start-btn, adding click listener');
+            startBtn.addEventListener('click', (e) => {
+                console.log('🖱️ start-btn clicked via event listener', e);
                 this.startTimer();
             });
+        } else {
+            console.error('❌ start-btn NOT FOUND in DOM');
         }
 
         // 頂部按鈕
@@ -855,25 +932,61 @@ const UI = {
             });
         }
 
-        // 記錄操作按鈕
-        const addRecordBtn = document.getElementById('add-record-btn');
-        if (addRecordBtn) {
-            addRecordBtn.addEventListener('click', () => {
+        // 記錄頁面導航按鈕
+        const recordsAddBtn = document.getElementById('records-add-btn');
+        if (recordsAddBtn) {
+            recordsAddBtn.addEventListener('click', () => {
                 this.showRecordModal('add');
             });
         }
 
-        const editRecordBtn = document.getElementById('edit-record-btn');
-        if (editRecordBtn) {
-            editRecordBtn.addEventListener('click', () => {
-                alert('請直接點擊時間軸上的記錄條來編輯');
+        const recordsSettingsBtn = document.getElementById('records-settings-btn');
+        if (recordsSettingsBtn) {
+            recordsSettingsBtn.addEventListener('click', () => {
+                this.showSettingsAdaptive();
             });
         }
 
-        const deleteRecordBtn = document.getElementById('delete-record-btn');
-        if (deleteRecordBtn) {
-            deleteRecordBtn.addEventListener('click', () => {
-                this.enableDeleteMode();
+        // 記錄頁面用戶頭像
+        const recordsUserAvatar = document.getElementById('records-user-avatar');
+        const recordsUserDropdown = document.getElementById('records-user-dropdown');
+        if (recordsUserAvatar && recordsUserDropdown) {
+            recordsUserAvatar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                recordsUserDropdown.classList.toggle('active');
+            });
+
+            // 點擊外部關閉
+            document.addEventListener('click', () => {
+                recordsUserDropdown.classList.remove('active');
+            });
+        }
+
+        const recordsLogoutBtn = document.getElementById('records-logout-btn');
+        if (recordsLogoutBtn) {
+            recordsLogoutBtn.addEventListener('click', async () => {
+                if (confirm('確定要登出嗎？\n登出後將切換到離線模式。')) {
+                    await FirebaseAuth.signOut();
+                    this.updateAccountUI();
+                    recordsUserDropdown?.classList.remove('active');
+                }
+            });
+        }
+
+
+
+        // 模態框內的刪除按鈕
+        const deleteRecordBtnModal = document.getElementById('delete-record-btn-modal');
+        if (deleteRecordBtnModal) {
+            deleteRecordBtnModal.addEventListener('click', async () => {
+                if (!this._editingRecordId) return;
+
+                if (confirm('確定要刪除這個記錄？')) {
+                    const dateStr = formatDate(this.currentDate);
+                    await Storage.deleteRecord(dateStr, this._editingRecordId);
+                    this.closeModal('record-edit-modal');
+                    await this.updateRecordsPage();
+                }
             });
         }
 
@@ -1071,10 +1184,44 @@ const UI = {
         }
     },
 
-    startTimer() {
+    async startTimer() {
+        console.log('👆 Start button clicked');
         const currentTask = Storage.getCurrentTask();
-        if (!currentTask) return;
+        console.log('Current task:', currentTask);
 
+        if (!currentTask) {
+            console.warn('❌ No current task found');
+            return;
+        }
+
+        // Check cloud timer_state if online
+        if (Storage.isOnline()) {
+            try {
+                const cloudState = await FirestoreDB.getTimerState();
+
+                if (cloudState) {
+                    // Conflict detected: show confirmation dialog
+                    const confirmed = confirm(
+                        '⚠️ 偵測到計時進行中\n\n' +
+                        '已有計時任務正在執行中。\n' +
+                        '在此裝置開始計時將自動結束先前的任務。\n\n' +
+                        '確定要繼續嗎？'
+                    );
+
+                    if (!confirmed) {
+                        console.log('❌ User cancelled timer start');
+                        return;
+                    }
+
+                    console.log('✅ User confirmed to override existing timer');
+                }
+            } catch (error) {
+                console.warn('⚠️ Failed to check cloud timer state, proceeding offline:', error);
+                // Network failure: allow offline timing
+            }
+        }
+
+        console.log('⏱️ Starting timer for:', currentTask.name);
         Timer.start(currentTask.id);
         this.showTimerRunningPage();
     },
@@ -1182,10 +1329,13 @@ const UI = {
 
         const barsDiv = document.createElement('div');
         barsDiv.className = 'timeline-bars';
-        barsDiv.style.height = `${24 * 40}px`;
+        // Height controlled by CSS for RWD support
 
         // 使用非同步方式載入記錄
         const records = await Storage.getRecordsByDateAsync(date);
+
+        // Get actual hour row height for RWD support
+        const hourHeight = hoursDiv.querySelector('.timeline-hour')?.offsetHeight || 40;
 
         records.forEach(record => {
             // 優先使用記錄中的快照資訊，保證歷史記錄正確顯示
@@ -1195,35 +1345,58 @@ const UI = {
             const startDate = new Date(record.startTime);
             const endDate = new Date(record.endTime);
 
-            const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
-            const endMinutes = endDate.getHours() * 60 + endDate.getMinutes();
+            // Get hour and minute components (with seconds precision)
+            const startHour = startDate.getHours();
+            const startMinute = startDate.getMinutes();
+            const startSecond = startDate.getSeconds();
 
-            const top = (startMinutes / (24 * 60)) * 100;
-            const height = ((endMinutes - startMinutes) / (24 * 60)) * 100;
+            // Use record.duration (in seconds) for precise calculation
+            const durationSeconds = record.duration;
 
-            const bar = document.createElement('div');
-            bar.className = 'timeline-bar';
-            bar.style.backgroundColor = taskColor;
-            bar.style.top = `${top}%`;
-            bar.style.height = `${height}%`;
-            bar.style.left = '0';
-            bar.style.right = '0';
-            bar.style.cursor = 'pointer';
-            bar.title = `${taskName} - ${formatDurationShort(record.duration)}\n點擊編輯`;
-            bar.dataset.recordId = record.id;
+            // Calculate start position in minutes (with decimal precision)
+            const startMinutesPrecise = startMinute + (startSecond / 60);
 
-            // 點擊事件
-            bar.addEventListener('click', () => {
-                if (this._deleteMode) {
-                    // 刪除模式：切換選擇
-                    this.toggleRecordSelection(record.id, bar);
-                } else {
-                    // 編輯模式
-                    this.showRecordModal('edit', record);
-                }
-            });
+            // For records spanning multiple hours, create separate bars for each hour
+            let currentHour = startHour;
+            let remainingSeconds = durationSeconds;
+            let isFirstSegment = true;
 
-            barsDiv.appendChild(bar);
+            while (remainingSeconds > 0 && currentHour < 24) {
+                const bar = document.createElement('div');
+                bar.className = 'timeline-bar';
+                bar.style.backgroundColor = taskColor;
+
+                // Calculate position within this hour
+                const minuteInHour = isFirstSegment ? startMinutesPrecise : 0;
+                const secondsFromHourStart = isFirstSegment ? (startMinute * 60 + startSecond) : 0;
+                const secondsLeftInHour = (60 * 60) - secondsFromHourStart; // Seconds until next hour
+                const secondsInThisHour = Math.min(secondsLeftInHour, remainingSeconds);
+
+                // Position: which hour row (top), and where in the 60-minute span (left)
+                bar.style.top = `${currentHour * hourHeight}px`;  // Responsive position based on hour
+                bar.style.left = `${(minuteInHour / 60) * 100}%`;  // Position within the hour (precise)
+                bar.style.width = `${((secondsInThisHour / 60) / 60) * 100}%`;  // Width based on duration (precise)
+                bar.style.cursor = 'pointer';
+                bar.title = `${taskName} - ${formatDurationShort(secondsInThisHour)}\n點擊編輯`;
+                bar.dataset.recordId = record.id;
+
+                // 點擊事件
+                bar.addEventListener('click', () => {
+                    if (this._deleteMode) {
+                        // 刪除模式：切換選擇
+                        this.toggleRecordSelection(record.id, bar);
+                    } else {
+                        // 編輯模式
+                        this.showRecordModal('edit', record);
+                    }
+                });
+
+                barsDiv.appendChild(bar);
+
+                remainingSeconds -= secondsInThisHour;
+                currentHour++;
+                isFirstSegment = false;
+            }
         });
 
         container.appendChild(barsDiv);
@@ -1339,6 +1512,11 @@ const UI = {
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
 
+        // 記錄頁面元素
+        const recordsUserAvatar = document.getElementById('records-user-avatar');
+        const recordsDropdownName = document.getElementById('records-dropdown-name');
+        const recordsDropdownEmail = document.getElementById('records-dropdown-email');
+
         if (!loggedOutDiv || !loggedInDiv) return;
 
         if (typeof FirebaseAuth !== 'undefined' && FirebaseAuth.isLoggedIn()) {
@@ -1350,9 +1528,19 @@ const UI = {
             if (userAvatar) userAvatar.src = user.photoURL || '';
             if (userName) userName.textContent = user.displayName || '用戶';
             if (userEmail) userEmail.textContent = user.email || '';
+
+            // 同步記錄頁面
+            if (recordsUserAvatar) recordsUserAvatar.src = user.photoURL || 'https://via.placeholder.com/40';
+            if (recordsDropdownName) recordsDropdownName.textContent = user.displayName || '用戶';
+            if (recordsDropdownEmail) recordsDropdownEmail.textContent = user.email || '';
         } else {
             loggedOutDiv.style.display = 'block';
             loggedInDiv.style.display = 'none';
+
+            // 離線模式 - 記錄頁面
+            if (recordsUserAvatar) recordsUserAvatar.src = 'https://via.placeholder.com/40?text=Guest';
+            if (recordsDropdownName) recordsDropdownName.textContent = '訪客模式';
+            if (recordsDropdownEmail) recordsDropdownEmail.textContent = '離線使用';
         }
     },
 
@@ -1570,6 +1758,7 @@ const UI = {
         const taskSelector = document.getElementById('record-task-selector');
         const taskDisplay = document.getElementById('record-task-display');
         const saveBtn = document.getElementById('save-record-edit');
+        const deleteBtn = document.getElementById('delete-record-btn-modal');
         const errorDiv = document.getElementById('record-error');
 
         // 重置狀態
@@ -1580,6 +1769,7 @@ const UI = {
         if (mode === 'add') {
             title.textContent = '添加紀錄';
             saveBtn.textContent = '添加';
+            if (deleteBtn) deleteBtn.style.display = 'none';
             taskSelector.style.display = 'block';
             taskDisplay.style.display = 'none';
             this.renderRecordTasksList();
@@ -1591,6 +1781,7 @@ const UI = {
         } else {
             title.textContent = '編輯紀錄';
             saveBtn.textContent = '儲存';
+            if (deleteBtn) deleteBtn.style.display = 'block';
             taskSelector.style.display = 'none';
             taskDisplay.style.display = 'flex';
 
@@ -1600,10 +1791,10 @@ const UI = {
 
             const startDate = new Date(record.startTime);
             const endDate = new Date(record.endTime);
-            document.getElementById('start-hour').value = startDate.getHours();
-            document.getElementById('start-minute').value = startDate.getMinutes();
-            document.getElementById('end-hour').value = endDate.getHours();
-            document.getElementById('end-minute').value = endDate.getMinutes();
+            document.getElementById('start-hour').value = String(startDate.getHours()).padStart(2, '0');
+            document.getElementById('start-minute').value = String(startDate.getMinutes()).padStart(2, '0');
+            document.getElementById('end-hour').value = String(endDate.getHours()).padStart(2, '0');
+            document.getElementById('end-minute').value = String(endDate.getMinutes()).padStart(2, '0');
         }
 
         modal.classList.add('active');
@@ -1639,16 +1830,22 @@ const UI = {
 
     // 驗證並保存記錄
     async saveRecord() {
-        const startHour = parseInt(document.getElementById('start-hour').value);
-        const startMinute = parseInt(document.getElementById('start-minute').value);
-        const endHour = parseInt(document.getElementById('end-hour').value);
-        const endMinute = parseInt(document.getElementById('end-minute').value);
+        const startHourInput = document.getElementById('start-hour').value;
+        const startMinuteInput = document.getElementById('start-minute').value;
+        const endHourInput = document.getElementById('end-hour').value;
+        const endMinuteInput = document.getElementById('end-minute').value;
 
-        // 驗證格式
-        if (isNaN(startHour) || isNaN(startMinute) || isNaN(endHour) || isNaN(endMinute)) {
+        // 驗證格式 - 檢查是否為空或無效
+        if (!startHourInput && startHourInput !== '0' || !startMinuteInput && startMinuteInput !== '0' ||
+            !endHourInput && endHourInput !== '0' || !endMinuteInput && endMinuteInput !== '0') {
             this.showRecordError('請填寫完整的時間');
             return;
         }
+
+        const startHour = parseInt(startHourInput);
+        const startMinute = parseInt(startMinuteInput);
+        const endHour = parseInt(endHourInput);
+        const endMinute = parseInt(endMinuteInput);
 
         if (startHour < 0 || startHour > 23 || endHour < 0 || endHour > 23) {
             this.showRecordError('小時必須在 0-23 之間');
@@ -1683,7 +1880,19 @@ const UI = {
 
         if (this._editingRecordId) {
             // 編輯模式
-            await Storage.updateRecord(dateStr, this._editingRecordId, { startTime, endTime });
+            const updates = { startTime, endTime };
+
+            // 如果選擇了新任務，也更新任務資訊
+            if (this._selectedTaskId) {
+                const task = Storage.getTask(this._selectedTaskId);
+                if (task) {
+                    updates.taskId = this._selectedTaskId;
+                    updates.taskName = task.name;
+                    updates.taskColor = task.color;
+                }
+            }
+
+            await Storage.updateRecord(dateStr, this._editingRecordId, updates);
             console.log('✅ 記錄已更新');
         } else {
             // 添加模式
@@ -1805,7 +2014,7 @@ Storage.updateRecord = async function (dateStr, recordId, updates) {
     }
 
     // 同步到雲端
-    if (App.isOnline()) {
+    if (this.isOnline()) {
         try {
             await FirestoreDB.updateRecord(dateStr, recordId, updates);
         } catch (error) {

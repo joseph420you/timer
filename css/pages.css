@@ -324,6 +324,9 @@
     flex-direction: column;
     padding-bottom: 80px;
     /* 底部導航高度 */
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    /* 為滾動條預留空間，防止佈局偏移 */
 }
 
 .daily-total {
@@ -360,8 +363,8 @@
 .record-section {
     flex: 1;
     padding: var(--spacing-lg);
-    padding-bottom: 160px;
-    /* 為固定操作按鈕和底部導航留空間 */
+    padding-bottom: 80px;
+    /* 為底部導航留空間 */
     overflow-y: auto;
 }
 
@@ -414,7 +417,7 @@
 
 .timeline-bar {
     position: absolute;
-    height: 32px;
+    height: 36px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -424,6 +427,8 @@
     font-size: var(--font-xs);
     color: white;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .timeline-bar:hover {
@@ -871,5 +876,25 @@
 
     .running-timer {
         font-size: 56px;
+    }
+}
+
+/* 手機版 - 時間軸高度調整 */
+@media (max-width: 767px) {
+    .timeline-hour {
+        height: 24px;
+        min-height: 24px;
+    }
+
+    .timeline-hours {
+        height: calc(24 * 24px);
+    }
+
+    .timeline-bars {
+        min-height: calc(24 * 24px);
+    }
+
+    .timeline-bar {
+        height: 22px;
     }
 }

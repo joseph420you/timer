@@ -10,6 +10,11 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.nav-icons {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
 .app-title {
     font-size: var(--font-xl);
     font-weight: 500;
@@ -42,6 +47,20 @@
 
 .icon-btn:active {
     background-color: var(--bg-tertiary);
+}
+
+/* 危險圖標按鈕（紅色） */
+.icon-btn.danger-icon {
+    color: var(--error-color);
+}
+
+.icon-btn.danger-icon:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+}
+
+.icon-btn.danger-icon:active {
+    background-color: rgba(239, 68, 68, 0.2);
 }
 
 /* 用戶頭像（導航欄） */
@@ -272,7 +291,23 @@
 .modal-title {
     font-size: var(--font-lg);
     font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* 模態框標題行（包含標題和刪除按鈕） */
+.modal-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: var(--spacing-lg);
+}
+
+.modal-header-row .modal-title {
+    margin-bottom: 0;
+}
+
+.modal-header-row .danger-icon {
+    flex-shrink: 0;
 }
 
 .modal-header {
@@ -298,11 +333,30 @@
 
 .modal-actions {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: var(--spacing-md);
     margin-top: var(--spacing-lg);
 }
 
-.modal-actions .action-btn {
+.modal-actions-right {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.modal-actions-right .action-btn {
+    flex: 1;
+    min-width: 100px;
+}
+
+/* 完整寬度的模態框操作按鈕（無左側按鈕） */
+.modal-actions-full {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.modal-actions-full .action-btn {
     flex: 1;
 }
 
@@ -590,27 +644,21 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
     background-color: var(--bg-tertiary);
     border-radius: var(--radius-md);
     margin-bottom: var(--spacing-md);
 }
 
-.change-task-btn {
+.record-task-display .icon-btn {
     margin-left: auto;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-sm);
-    color: var(--accent-color);
-    background: transparent;
-    border: 1px solid var(--accent-color);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--transition-fast);
+    color: var(--text-tertiary);
+    transition: color var(--transition-fast);
 }
 
-.change-task-btn:hover {
-    background-color: var(--accent-color);
-    color: white;
+.record-task-display .icon-btn:hover {
+    color: var(--accent-color);
+    background-color: rgba(59, 130, 246, 0.1);
 }
 
 /* 刪除模式 */
