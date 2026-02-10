@@ -19,7 +19,8 @@ import {
     deleteRecords,
     checkTimeOverlap,
     formatDate,
-    getTask
+    getTask,
+    addRecord
 } from './storage.js';
 import { timer } from './timer.js';
 
@@ -160,6 +161,10 @@ class UI {
             this.saveRecordEdit();
         });
 
+        document.getElementById('delete-record-btn-modal')?.addEventListener('click', () => {
+            this.deleteCurrentRecord();
+        });
+
         // 點擊對話框外部關閉
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -169,6 +174,50 @@ class UI {
             });
         });
 
+        this.setupTimeInputListeners();
+    }
+
+    // 設定時間輸入框監聽器 (Auto-tab & Input Limit)
+    setupTimeInputListeners() {
+        const inputs = [
+            document.getElementById('start-hour'),
+            document.getElementById('start-minute'),
+            document.getElementById('end-hour'),
+            document.getElementById('end-minute')
+        ];
+
+        inputs.forEach((input, index) => {
+            if (!input) return;
+
+            input.addEventListener('input', (e) => {
+                // 移除非數字字符
+                let value = e.target.value.replace(/[^0-9]/g, '');
+
+                // 限制最多 2 位數
+                if (value.length > 2) {
+                    value = value.slice(0, 2);
+                }
+
+                // 更新值 (如果發生變化)
+                if (e.target.value !== value) {
+                    e.target.value = value;
+                }
+
+                // 輸入 2 位數後自動跳到下一格
+                if (value.length === 2) {
+                    const nextInput = inputs[index + 1];
+                    if (nextInput) {
+                        nextInput.focus();
+                        nextInput.select();
+                    }
+                }
+            });
+
+            // 聚焦時自動選中內容
+            input.addEventListener('focus', (e) => {
+                e.target.select();
+            });
+        });
     }
 
     // 顯示頁面
@@ -625,6 +674,16 @@ class UI {
             return;
         }
 
+        // 驗證不能添加未來時間的紀錄
+        const now = new Date();
+        const recordStartTime = new Date(this.currentDate);
+        recordStartTime.setHours(startHour, startMinute, 0, 0);
+
+        if (recordStartTime >= now) {
+            this.showRecordError('不能為未來時間添加紀錄');
+            return;
+        }
+
         // 檢查時間重疊
         const dateStr = formatDate(this.currentDate);
         if (checkTimeOverlap(startMinutes, endMinutes, dateStr, this.editingRecordId)) {
@@ -632,8 +691,22 @@ class UI {
             return;
         }
 
-        // TODO: 實際儲存記錄
-        // 這裡需要實作新增/編輯記錄的邏輯
+        // 實際儲存記錄
+        const startDate = new Date(this.currentDate);
+        startDate.setHours(startHour, startMinute, 0, 0);
+        const endDate = new Date(this.currentDate);
+        endDate.setHours(endHour, endMinute, 0, 0);
+
+        // 獲取選中的任務
+        const selectedTaskElem = document.querySelector('.record-task-item.selected');
+        if (!selectedTaskElem) {
+            this.showRecordError('請選擇任務');
+            return;
+        }
+        const taskId = selectedTaskElem.dataset.taskId;
+
+        // 添加記錄
+        addRecord(taskId, startDate.getTime(), endDate.getTime());
 
         this.closeModal('record-edit-modal');
         this.updateRecordsPage();
@@ -646,6 +719,21 @@ class UI {
         errorDiv.style.display = 'block';
         errorDiv.classList.add('shake');
         setTimeout(() => errorDiv.classList.remove('shake'), 500);
+    }
+
+    // 刪除當前編輯的記錄
+    deleteCurrentRecord() {
+        if (!this.editingRecordId) {
+            return;
+        }
+
+        if (confirm('確定要刪除這筆記錄嗎？')) {
+            const dateStr = formatDate(this.currentDate);
+            deleteRecords(dateStr, [this.editingRecordId]);
+
+            this.closeModal('record-edit-modal');
+            this.updateRecordsPage();
+        }
     }
 
     // 更新全部記錄頁面

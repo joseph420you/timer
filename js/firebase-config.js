@@ -3,7 +3,7 @@ const firebaseConfig = window.firebaseConfig;
 
 // 檢查配置是否有效
 if (!firebaseConfig || firebaseConfig.apiKey === 'PLACEHOLDER') {
-    console.error('❌ Firebase 配置無效！請更新 js/config.js 檔案中的設定。');
+
     alert('請先在 js/config.js 中設定您的 Firebase Config！');
 } else {
     // 初始化 Firebase
@@ -14,7 +14,7 @@ if (!firebaseConfig || firebaseConfig.apiKey === 'PLACEHOLDER') {
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-console.log('✅ Firebase 已初始化，專案:', firebaseConfig.projectId);
+
 
 // ========== Firebase 認證模組 ==========
 const FirebaseAuth = {
@@ -26,10 +26,10 @@ const FirebaseAuth = {
         // 處理 Redirect 登入結果
         auth.getRedirectResult().then((result) => {
             if (result.user) {
-                console.log('🔗 Redirect 登入成功:', result.user.email);
+
             }
         }).catch((error) => {
-            console.error('Redirect 登入錯誤:', error);
+
         });
 
         auth.onAuthStateChanged((user) => {
@@ -37,9 +37,7 @@ const FirebaseAuth = {
             this.onAuthStateChangedCallbacks.forEach(callback => callback(user));
 
             if (user) {
-                console.log('✅ 已登入:', user.displayName || user.email);
-            } else {
-                console.log('❌ 未登入');
+
             }
         });
     },
@@ -59,13 +57,13 @@ const FirebaseAuth = {
             const provider = new firebase.auth.GoogleAuthProvider();
             // 使用 Popup 方式登入（對本地開發更友善）
             const result = await auth.signInWithPopup(provider);
-            console.log('✅ Google 登入成功:', result.user.email);
+
             return result.user;
         } catch (error) {
-            console.error('Google 登入失敗:', error.code, error.message);
+
             // 處理常見錯誤
             if (error.code === 'auth/popup-closed-by-user') {
-                console.log('用戶關閉了登入視窗');
+
             } else if (error.code === 'auth/popup-blocked') {
                 alert('彈出視窗被瀏覽器阻擋，請允許彈出視窗後重試');
             }
@@ -78,7 +76,7 @@ const FirebaseAuth = {
         try {
             await auth.signOut();
         } catch (error) {
-            console.error('登出失敗:', error);
+
             throw error;
         }
     },
@@ -117,7 +115,7 @@ const FirestoreDB = {
             }
             return { items: [] };
         } catch (error) {
-            console.error('取得 Tasks 配置失敗:', error);
+
             return { items: [] };
         }
     },
@@ -143,7 +141,7 @@ const FirestoreDB = {
             await db.doc(`${userPath}/config/tasks`).set(config);
             return true;
         } catch (error) {
-            console.error('儲存 Tasks 配置失敗:', error);
+
             return false;
         }
     },
@@ -194,7 +192,7 @@ const FirestoreDB = {
             }
             return null;
         } catch (error) {
-            console.error(`取得 ${dateStr} 記錄失敗:`, error);
+
             return null;
         }
     },
@@ -213,7 +211,7 @@ const FirestoreDB = {
             await db.doc(`${userPath}/dailyRecords/${dateStr}`).set(dailyRecord);
             return true;
         } catch (error) {
-            console.error(`儲存 ${dateStr} 記錄失敗:`, error);
+
             return false;
         }
     },
@@ -273,7 +271,7 @@ const FirestoreDB = {
 
             return snapshot.docs.map(doc => doc.id);
         } catch (error) {
-            console.error('取得記錄日期列表失敗:', error);
+
             return [];
         }
     },
@@ -287,7 +285,7 @@ const FirestoreDB = {
             await db.doc(`${userPath}/config/timerState`).set(state);
             return true;
         } catch (error) {
-            console.error('儲存計時器狀態失敗:', error);
+
             return false;
         }
     },
@@ -300,7 +298,7 @@ const FirestoreDB = {
             const doc = await db.doc(`${userPath}/config/timerState`).get();
             return doc.exists ? doc.data() : null;
         } catch (error) {
-            console.error('取得計時器狀態失敗:', error);
+
             return null;
         }
     },
@@ -313,7 +311,7 @@ const FirestoreDB = {
             await db.doc(`${userPath}/config/timerState`).delete();
             return true;
         } catch (error) {
-            console.error('清除計時器狀態失敗:', error);
+
             return false;
         }
     },
@@ -327,7 +325,7 @@ const FirestoreDB = {
             await db.doc(`${userPath}/config/currentTask`).set({ taskId });
             return true;
         } catch (error) {
-            console.error('設定當前任務失敗:', error);
+
             return false;
         }
     },
@@ -340,7 +338,7 @@ const FirestoreDB = {
             const doc = await db.doc(`${userPath}/config/currentTask`).get();
             return doc.exists ? doc.data().taskId : null;
         } catch (error) {
-            console.error('取得當前任務失敗:', error);
+
             return null;
         }
     }
@@ -349,4 +347,4 @@ const FirestoreDB = {
 // 初始化 Firebase 認證
 FirebaseAuth.init();
 
-console.log('🔥 Firebase 已初始化');
+

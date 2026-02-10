@@ -80,33 +80,33 @@ const Storage = {
 
     // 初始化
     async init() {
-        console.log('🔧 Storage 初始化中...');
+
 
         // 載入本地配置
         const tasksConfig = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.TASKS);
         if (tasksConfig) {
             this._tasksConfig = JSON.parse(tasksConfig);
-            console.log('📖 載入本地任務配置:', this._tasksConfig.items.length, '個任務');
+
         } else {
             // 初始化預設配置
             this._tasksConfig = { items: [] };
             this.saveTasksConfig(this._tasksConfig);
-            console.log('🆕 初始化新任務配置');
+
         }
 
         // 監聽認證狀態變化
         if (typeof FirebaseAuth !== 'undefined') {
-            console.log('🕵️ 註冊認證狀態監聽...');
+
             FirebaseAuth.onAuthStateChanged(async (user) => {
                 const wasOnline = this._isOnline;
                 this._isOnline = !!user;
-                console.log(`📡 連線狀態變更: ${wasOnline} -> ${this._isOnline}`, user ? `(用戶: ${user.uid})` : '(未登入)');
+
 
                 if (user) {
-                    console.log('🔄 開始同步雲端資料...');
+
                     await this.syncFromCloud();
                 } else {
-                    console.log('💾 已登出，清除緩存');
+
                     // 保持 _tasksConfig 不變，允許離線查看，或者根據需求清除
                     this._dailyRecordsCache = {};
                 }
@@ -123,7 +123,7 @@ const Storage = {
         if (!this.isOnline()) return;
 
         try {
-            console.log('🔄 正在從雲端同步資料...');
+
 
             // 同步 Tasks 配置
             let tasksConfig = await FirestoreDB.getTasksConfig();
@@ -131,7 +131,7 @@ const Storage = {
             // 檢查是否為初次同步（雲端為空，本地有資料）
             if ((!tasksConfig || !tasksConfig.items || tasksConfig.items.length === 0) &&
                 this._tasksConfig && this._tasksConfig.items && this._tasksConfig.items.length > 0) {
-                console.log('📤 偵測到本地有資料而雲端為空，執行初次上傳...');
+
                 await this.saveTasksConfig(this._tasksConfig);
                 tasksConfig = this._tasksConfig;
             } else {
@@ -155,13 +155,13 @@ const Storage = {
             const today = formatDate(new Date());
             await this.loadDailyRecord(today);
 
-            console.log('✅ 雲端同步完成');
+
 
             if (typeof UI !== 'undefined' && UI.updateHomePage) {
                 UI.updateHomePage();
             }
         } catch (error) {
-            console.error('❌ 雲端同步失敗:', error);
+
         }
     },
 
@@ -181,7 +181,7 @@ const Storage = {
                 }
             }
         } catch (e) {
-            console.error('Error parsing tasks config:', e);
+
         }
 
         // Update cache if needed
@@ -228,22 +228,20 @@ const Storage = {
         // 先儲存到本地
         config.items.push(newTask);
         this.saveTasksConfig(config);
-        console.log('✅ 任務已儲存到本地:', newTask.name);
+
 
         // 嘗試同步到雲端（非阻塞 Fire-and-forget）
         const isOnline = this.isOnline();
-        console.log('🌐 線上狀態:', isOnline, '| 已登入:', FirebaseAuth?.isLoggedIn());
+
 
         if (isOnline) {
-            console.log('🔄 開始同步任務到雲端...');
+
             FirestoreDB.saveTasksConfig(config)
-                .then(() => console.log('✅ 任務已同步到雲端:', newTask.name))
                 .catch(error => {
-                    console.error('❌ 雲端同步失敗:', error);
-                    console.warn('⚠️ 任務僅儲存在本地');
+
                 });
         } else {
-            console.warn('⚠️ 離線模式，任務僅儲存在本地');
+
         }
 
         return newTask;
@@ -259,7 +257,7 @@ const Storage = {
 
         if (this.isOnline()) {
             FirestoreDB.updateTask(taskId, updates)
-                .catch(error => console.warn('⚠️ 雲端更新任務失敗:', error));
+                .catch(error => { });
         }
         return config.items[index];
     },
@@ -270,7 +268,7 @@ const Storage = {
         const currentTaskId = localStorage.getItem(APP_CONFIG.STORAGE_KEYS.CURRENT_TASK);
         if (currentTaskId === taskId) {
             localStorage.removeItem(APP_CONFIG.STORAGE_KEYS.CURRENT_TASK);
-            console.log('🗑️ 已清除當前任務選擇');
+
         }
         return await this.updateTask(taskId, { isDeleted: true });
     },
@@ -323,7 +321,7 @@ const Storage = {
     async addRecord(taskId, startTime, endTime) {
         const task = this.getTask(taskId);
         if (!task) {
-            console.error('找不到任務:', taskId);
+
             return null;
         }
 
@@ -352,7 +350,7 @@ const Storage = {
         // 同步到雲端（非阻塞）
         if (this.isOnline()) {
             FirestoreDB.addRecord(taskId, task.name, task.color, startTime, endTime)
-                .catch(error => console.warn('⚠️ 雲端新增記錄失敗:', error));
+                .catch(error => { });
         }
 
         return newRecord;
@@ -374,7 +372,7 @@ const Storage = {
         // 同步到雲端（非阻塞）
         if (this.isOnline()) {
             FirestoreDB.deleteRecords(dateStr, recordIds)
-                .catch(error => console.warn('⚠️ 雲端刪除記錄失敗:', error));
+                .catch(error => { });
         }
 
         return true;
@@ -416,7 +414,7 @@ const Storage = {
 
             if (this.isOnline()) {
                 FirestoreDB.saveTimerState(state)
-                    .catch(error => console.warn('⚠️ 雲端儲存計時器狀態失敗:', error));
+                    .catch(error => { });
             }
         } else {
             localStorage.removeItem(APP_CONFIG.STORAGE_KEYS.TIMER_STATE);
@@ -428,7 +426,7 @@ const Storage = {
 
         if (this.isOnline()) {
             FirestoreDB.clearTimerState()
-                .catch(error => console.warn('⚠️ 雲端清除計時器狀態失敗:', error));
+                .catch(error => { });
         }
     },
 
@@ -461,9 +459,9 @@ const Timer = {
     },
 
     start(taskId = null) {
-        console.log('Timer.start called with taskId:', taskId, 'isRunning:', this.isRunning);
+
         if (this.isRunning) {
-            console.warn('⚠️ Timer is already running, ignoring start request');
+
             return;
         }
 
@@ -512,14 +510,14 @@ const Timer = {
 
                     // Check if sessionId matches
                     if (cloudState && cloudState.sessionId !== this.sessionId) {
-                        console.warn('⚠️ SessionId mismatch: timer taken over by another device');
+
                         isValid = false;
 
                         // Show invalid record message
                         alert('⚠️ 此計時記錄已失效\n\n偵測到計時已在其他裝置繼續，此次記錄將不會儲存。');
                     }
                 } catch (error) {
-                    console.warn('⚠️ Failed to validate sessionId, preserving record:', error);
+
                     // Network failure: preserve record (優先保留記錄)
                     isValid = true;
                 }
@@ -563,7 +561,7 @@ const UI = {
     currentMonth: new Date(),
 
     init() {
-        console.log('🚀 Timer App 正在啟動...');
+
 
         // 設定登入頁面事件
         this.setupLoginPageEvents();
@@ -575,7 +573,7 @@ const UI = {
             });
         } else {
             // Firebase 未載入，顯示錯誤
-            console.error('Firebase 未正確載入');
+
         }
 
         // 計時中離開頁面警告
@@ -586,7 +584,7 @@ const UI = {
             }
         });
 
-        console.log('✅ Timer App 啟動完成！');
+
     },
 
     setupLoginPageEvents() {
@@ -627,7 +625,7 @@ const UI = {
 
         if (user) {
             // 已登入 - 隱藏登入頁面，顯示主介面
-            console.log('👤 用戶已登入:', user.displayName);
+
 
             if (loginPage) loginPage.classList.add('hidden');
             if (appContainer) appContainer.style.display = 'block';
@@ -636,7 +634,7 @@ const UI = {
             this.initMainApp();
         } else {
             // 未登入 - 顯示登入頁面，隱藏主介面
-            console.log('🔒 用戶未登入');
+
 
             if (loginPage) loginPage.classList.remove('hidden');
             if (appContainer) appContainer.style.display = 'none';
@@ -665,7 +663,7 @@ const UI = {
     _initialized: false,
 
     initMainApp() {
-        console.log('🔄 initMainApp called. _initialized:', this._initialized);
+
         // 只在第一次初始化時綁定事件
         if (!this._initialized) {
             Storage.initializeSampleData();
@@ -673,7 +671,7 @@ const UI = {
             this.setupEventListeners();
             this.renderGlowRays();
             this._initialized = true;
-            console.log('✅ UI Initialized');
+
         }
 
         // 每次登入都更新這些
@@ -761,13 +759,13 @@ const UI = {
         // START 按鈕
         const startBtn = document.getElementById('start-btn');
         if (startBtn) {
-            console.log('✅ Found start-btn, adding click listener');
+
             startBtn.addEventListener('click', (e) => {
-                console.log('🖱️ start-btn clicked via event listener', e);
+
                 this.startTimer();
             });
         } else {
-            console.error('❌ start-btn NOT FOUND in DOM');
+
         }
 
         // 頂部按鈕
@@ -983,7 +981,7 @@ const UI = {
 
                 if (confirm('確定要刪除這個記錄？')) {
                     const dateStr = formatDate(this.currentDate);
-                    await Storage.deleteRecord(dateStr, this._editingRecordId);
+                    await Storage.deleteRecords(dateStr, [this._editingRecordId]);
                     this.closeModal('record-edit-modal');
                     await this.updateRecordsPage();
                 }
@@ -1185,12 +1183,12 @@ const UI = {
     },
 
     async startTimer() {
-        console.log('👆 Start button clicked');
+
         const currentTask = Storage.getCurrentTask();
-        console.log('Current task:', currentTask);
+
 
         if (!currentTask) {
-            console.warn('❌ No current task found');
+
             return;
         }
 
@@ -1209,19 +1207,19 @@ const UI = {
                     );
 
                     if (!confirmed) {
-                        console.log('❌ User cancelled timer start');
+
                         return;
                     }
 
-                    console.log('✅ User confirmed to override existing timer');
+
                 }
             } catch (error) {
-                console.warn('⚠️ Failed to check cloud timer state, proceeding offline:', error);
+
                 // Network failure: allow offline timing
             }
         }
 
-        console.log('⏱️ Starting timer for:', currentTask.name);
+
         Timer.start(currentTask.id);
         this.showTimerRunningPage();
     },
@@ -1457,7 +1455,7 @@ const UI = {
         const newTask = await Storage.addTask(name, color);
 
         if (newTask) {
-            console.log('✅ 新增任務成功:', newTask.name);
+
         }
 
         if (nameInput) nameInput.value = '';
@@ -1482,7 +1480,7 @@ const UI = {
                     <div class="settings-task-name">${task.name}</div>
                 </div>
                 <div class="settings-task-actions">
-                    <button class="icon-btn delete-task-btn" data-task-id="${task.id}">
+                    <button class="icon-btn delete-task-btn danger-icon" data-task-id="${task.id}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="3 6 5 6 21 6"></polyline>
                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -1567,7 +1565,7 @@ const UI = {
 
         // 設定標題和內容
         if (type === 'settings') {
-            title.textContent = '設定';
+            title.textContent = '任務管理';
             content.innerHTML = this.renderSettingsPanelContent();
             this.bindSettingsPanelEvents(content);
         } else if (type === 'add-task') {
@@ -1608,7 +1606,7 @@ const UI = {
                         <div class="side-panel-task-name">${task.name}</div>
                     </div>
                     <div class="side-panel-task-actions">
-                        <button class="icon-btn delete-task-btn" data-task-id="${task.id}">
+                        <button class="icon-btn delete-task-btn danger-icon" data-task-id="${task.id}">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
                                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -1621,7 +1619,7 @@ const UI = {
 
         return `
             <div class="side-panel-section">
-                <h3>任務管理</h3>
+                
                 <div class="side-panel-tasks-list">
                     ${tasksHtml || '<p style="color: var(--text-tertiary); text-align: center;">尚無任務</p>'}
                 </div>
@@ -1718,7 +1716,7 @@ const UI = {
                 const newTask = await Storage.addTask(name, color);
 
                 if (newTask) {
-                    console.log('✅ 新增任務成功:', newTask.name);
+
                 }
 
                 // 更新首頁並回到設定面板
@@ -1865,6 +1863,16 @@ const UI = {
             return;
         }
 
+        // 驗證不能添加未來時間的紀錄
+        const now = new Date();
+        const recordStartTime = new Date(this.currentDate);
+        recordStartTime.setHours(startHour, startMinute, 0, 0);
+
+        if (recordStartTime >= now) {
+            this.showRecordError('不能為未來時間添加紀錄');
+            return;
+        }
+
         const dateStr = formatDate(this.currentDate);
 
         // 檢查時間重疊
@@ -1893,7 +1901,7 @@ const UI = {
             }
 
             await Storage.updateRecord(dateStr, this._editingRecordId, updates);
-            console.log('✅ 記錄已更新');
+
         } else {
             // 添加模式
             if (!this._selectedTaskId) {
@@ -1901,7 +1909,7 @@ const UI = {
                 return;
             }
             await Storage.addRecord(this._selectedTaskId, startTime, endTime);
-            console.log('✅ 記錄已添加');
+
         }
 
         this.closeModal('record-edit-modal');
@@ -1988,7 +1996,7 @@ const UI = {
         if (confirm(`確定要刪除這 ${this._selectedRecordIds.length} 條記錄嗎？`)) {
             const dateStr = formatDate(this.currentDate);
             await Storage.deleteRecords(dateStr, this._selectedRecordIds);
-            console.log('✅ 記錄已刪除');
+
             this.exitDeleteMode();
             await this.updateRecordsPage();
         }
@@ -2018,7 +2026,7 @@ Storage.updateRecord = async function (dateStr, recordId, updates) {
         try {
             await FirestoreDB.updateRecord(dateStr, recordId, updates);
         } catch (error) {
-            console.warn('⚠️ 雲端更新記錄失敗:', error);
+
         }
     }
 
