@@ -99,28 +99,17 @@
     padding-bottom: calc(80px + var(--spacing-lg));
     /* 底部導航高度 */
     gap: var(--spacing-lg);
+    max-width: 430px;
+    margin: 0 auto;
 }
 
-/* 首頁日期顯示 - 在圓形上方 */
-/* 首頁日期顯示 - 在圓形上方 */
-.home-date {
-    font-size: 24px !important;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    margin-bottom: var(--spacing-sm) !important;
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-}
+
 
 /* 光暈容器 */
 .glow-container {
     position: relative;
-    width: 100%;
-    max-width: 350px;
-    aspect-ratio: 1;
+    width: 300px;
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -130,8 +119,8 @@
 /* 光暈圓圈效果 */
 .glow-circle {
     position: relative;
-    width: 85%;
-    aspect-ratio: 1;
+    width: 280px;
+    height: 280px;
     border-radius: var(--radius-full);
     background: radial-gradient(circle, rgba(26, 26, 26, 0.95) 0%, rgba(26, 26, 26, 0.7) 60%, transparent 100%);
     border: 2px solid rgba(255, 255, 255, 0.15);
@@ -139,6 +128,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    padding-top: 30px;
     gap: var(--spacing-sm);
     z-index: 2;
     /* 光暈發光效果 */
@@ -150,34 +140,29 @@
 }
 
 .home-date {
-    font-size: clamp(12px, 3vw, 14px);
+    font-size: 16px;
     color: var(--text-secondary);
     letter-spacing: 1px;
-    margin-top: clamp(60px, 20%, 100px);
+    margin-top: 0;
 }
 
 .total-time {
-    font-size: clamp(40px, 12vw, 64px);
+    font-size: 56px;
     font-weight: 300;
     letter-spacing: 2px;
     line-height: 1;
-    margin-top: clamp(8px, 2%, 16px);
 }
 
 .task-info {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-sm);
-    margin-top: clamp(10px, 4%, 30px);
 }
 
 .task-selector {
-    display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
     cursor: pointer;
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md) 0 var(--spacing-md);
     border-radius: var(--radius-full);
     transition: background-color var(--transition-fast);
     -webkit-tap-highlight-color: transparent;
@@ -189,12 +174,12 @@
 }
 
 .task-name {
-    font-size: clamp(14px, 4vw, 18px);
+    font-size: 16px;
     color: var(--text-primary);
 }
 
 .task-time {
-    font-size: clamp(12px, 3vw, 14px);
+    font-size: 14px;
     color: var(--text-secondary);
 }
 
@@ -210,38 +195,10 @@
     animation: glowRotate 120s linear infinite;
 }
 
-/* 光暈芒刺 - 永久顯示 */
-/* 動態漸層光芒效果 */
+/* 迷霧效果 - 已停用，僅保留圓形光暈 */
 .glow-circle::before,
 .glow-circle::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 160%;
-    height: 160%;
-    transform: translate(-50%, -50%);
-    background:
-        radial-gradient(ellipse 80% 50% at 30% 20%, var(--accent-color) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 80% at 70% 80%, var(--accent-color) 0%, transparent 45%),
-        radial-gradient(ellipse 50% 60% at 20% 70%, var(--accent-color) 0%, transparent 40%);
-    border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-    z-index: -1;
-    opacity: 0.4;
-    filter: blur(60px);
-    animation: blobSpin 12s ease-in-out infinite;
-}
-
-.glow-circle::after {
-    width: 180%;
-    height: 180%;
-    background:
-        radial-gradient(ellipse 70% 40% at 60% 30%, var(--accent-color) 0%, transparent 45%),
-        radial-gradient(ellipse 40% 70% at 40% 60%, var(--accent-color) 0%, transparent 40%),
-        radial-gradient(ellipse 60% 50% at 80% 50%, var(--accent-color) 0%, transparent 35%);
-    opacity: 0.3;
-    filter: blur(70px);
-    animation: blobSpin 16s ease-in-out infinite reverse;
+    display: none;
 }
 
 /* 光暈芒刺 - 已移除 */
@@ -810,9 +767,8 @@
 
 /* 響應式調整 */
 @media (min-width: 768px) {
-    .total-time {
-        font-size: 80px;
-    }
+    /* 移除首頁與圓圈內的文字放大設定，與 Mobile 版維持一致 */
+    /* .total-time, .home-date, .task-name, .task-time, .task-selector 皆使用預設樣式 */
 
     .running-timer {
         font-size: 96px;
@@ -820,25 +776,6 @@
 
     .color-grid {
         grid-template-columns: repeat(10, 1fr);
-    }
-
-    /* 桌面版 - 日期字體加大 */
-    .home-date {
-        font-size: var(--font-xl) !important;
-    }
-
-    /* 桌面版 - 任務名稱加大 */
-    .task-name {
-        font-size: var(--font-xl);
-    }
-
-    .task-time {
-        font-size: var(--font-md);
-    }
-
-    /* 桌面版 - 任務選擇器加大 */
-    .task-selector {
-        padding: var(--spacing-md) var(--spacing-lg);
     }
 
     /* 桌面版 - 模態對話框內的任務名稱加大 */
