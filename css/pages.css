@@ -360,7 +360,7 @@
     justify-content: center;
     font-size: var(--font-xs);
     color: var(--text-tertiary);
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .timeline-bars {
@@ -369,8 +369,11 @@
     height: 960px;
     /* 24 小時 * 40px */
     /* 使用背景圖案模擬網格線 */
-    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
-    background-size: 100% 40px;
+    background-image: repeating-linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.15) 0,
+            rgba(255, 255, 255, 0.15) 1px,
+            transparent 1px,
+            transparent 40px);
 }
 
 .timeline-bar {
@@ -823,6 +826,7 @@
     .timeline-hour {
         height: 24px;
         min-height: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .timeline-hours {
@@ -832,7 +836,11 @@
     .timeline-bars {
         min-height: calc(24 * 24px);
         height: calc(24 * 24px);
-        background-size: 100% 24px;
+        background-image: repeating-linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.2) 0,
+                rgba(255, 255, 255, 0.2) 1px,
+                transparent 1px,
+                transparent 24px);
     }
 
     .timeline-bar {
