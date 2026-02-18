@@ -171,6 +171,7 @@
     background-color: var(--bg-secondary);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     padding: var(--spacing-sm) 0;
+    padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom, 0px));
     z-index: var(--z-sticky);
 }
 
