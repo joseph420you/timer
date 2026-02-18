@@ -8,6 +8,11 @@
     padding: 10px var(--spacing-lg);
     background-color: var(--bg-primary);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-sticky);
 }
 
 .nav-icons {
@@ -385,7 +390,7 @@
     align-items: center;
     justify-content: center;
     gap: var(--spacing-lg);
-    padding: 5px var(--spacing-md) 0;
+    padding: 13px var(--spacing-md) 0;
 }
 
 .date-nav-btn {

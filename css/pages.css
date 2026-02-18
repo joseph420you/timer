@@ -96,6 +96,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--spacing-lg) var(--spacing-lg);
+    padding-top: 52px;
     padding-bottom: calc(80px + var(--spacing-lg) + env(safe-area-inset-bottom, 0px));
     /* 底部導航高度 + 安全區域 */
     gap: 60px 16px;
@@ -278,6 +279,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    padding-top: 52px;
     padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
     /* 底部導航高度 + 安全區域 */
     overflow-y: auto;

@@ -2,7 +2,7 @@
   "name": "timer-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "npx http-server -p 8080"
+    "start": "npx http-server -p 8080 -c-1"
   },
   "devDependencies": {
     "http-server": "^14.1.1"
