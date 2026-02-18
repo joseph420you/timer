@@ -346,10 +346,11 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 50px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     height: calc(24 * 40px);
+    z-index: 0;
 }
 
 .timeline-hour {
@@ -357,7 +358,7 @@
     min-height: 40px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding-left: 12px;
     font-size: var(--font-xs);
     color: var(--text-tertiary);
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
@@ -368,12 +369,7 @@
     position: relative;
     height: 960px;
     /* 24 小時 * 40px */
-    /* 使用背景圖案模擬網格線 */
-    background-image: repeating-linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.15) 0,
-            rgba(255, 255, 255, 0.15) 1px,
-            transparent 1px,
-            transparent 40px);
+    z-index: 1;
 }
 
 .timeline-bar {
@@ -826,7 +822,6 @@
     .timeline-hour {
         height: 24px;
         min-height: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .timeline-hours {
@@ -836,11 +831,6 @@
     .timeline-bars {
         min-height: calc(24 * 24px);
         height: calc(24 * 24px);
-        background-image: repeating-linear-gradient(to bottom,
-                rgba(255, 255, 255, 0.2) 0,
-                rgba(255, 255, 255, 0.2) 1px,
-                transparent 1px,
-                transparent 24px);
     }
 
     .timeline-bar {
