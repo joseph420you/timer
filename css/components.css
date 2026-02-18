@@ -7,7 +7,6 @@
     justify-content: space-between;
     padding: 10px var(--spacing-lg);
     background-color: var(--bg-primary);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     position: fixed;
     top: 0;
     left: 0;
@@ -382,6 +381,7 @@
     color: var(--text-secondary);
     text-align: center;
     letter-spacing: 0.5px;
+    min-width: 156px;
 }
 
 /* 日期導航 */

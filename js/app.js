@@ -1460,8 +1460,7 @@ const UI = {
 
         if (nameInput) nameInput.value = '';
 
-        this.showPage('home');
-        this.updateHomePage();
+        this.showPage('settings');
     },
 
     updateSettingsPage() {
