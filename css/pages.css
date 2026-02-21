@@ -127,9 +127,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding-top: 30px;
-    gap: var(--spacing-sm);
+    justify-content: space-between;
+    padding: 70px 0 50px 0;
     z-index: 2;
     /* 光暈發光效果 */
     box-shadow:
@@ -140,14 +139,20 @@
 }
 
 .home-date {
-    font-size: 16px;
+    font-size: 22px;
     color: var(--text-secondary);
     letter-spacing: 1px;
     margin-top: 0;
 }
 
 .total-time {
-    font-size: 56px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+    font-size: 66px;
     font-weight: 300;
     letter-spacing: 2px;
     line-height: 1;
@@ -637,7 +642,6 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
-    padding: var(--spacing-md);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: background-color var(--transition-fast);
@@ -647,18 +651,14 @@
     background-color: var(--bg-tertiary);
 }
 
-.modal-task-info {
-    flex: 1;
-}
-
 .modal-task-name {
     font-size: var(--font-md);
+    flex: 1;
 }
 
 .modal-task-time {
     font-size: var(--font-sm);
     color: var(--text-tertiary);
-    margin-top: var(--spacing-xs);
 }
 
 /* ========== 帳戶區塊 ========== */
@@ -818,7 +818,7 @@
 
 @media (max-width: 374px) {
     .total-time {
-        font-size: var(--font-3xl);
+        font-size: 66px;
     }
 
     .running-timer {

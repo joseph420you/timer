@@ -200,7 +200,8 @@ const Storage = {
     // 取得活躍的 Tasks（排除已刪除）
     getTasks() {
         const config = this.getTasksConfig();
-        return (config.items || []).filter(task => !task.isDeleted);
+        const activeTasks = (config.items || []).filter(task => !task.isDeleted);
+        return activeTasks.sort((a, b) => a.name.localeCompare(b.name));
     },
 
     // 取得所有 Tasks（包含已刪除，用於顯示歷史記錄）
@@ -1154,10 +1155,8 @@ const UI = {
             item.className = 'modal-task-item';
             item.innerHTML = `
                 <span class="task-color-bar" style="background-color: ${task.color}"></span>
-                <div class="modal-task-info">
-                    <div class="modal-task-name">${task.name}</div>
-                    <div class="modal-task-time">${formatDuration(taskSeconds)}</div>
-                </div>
+                <div class="modal-task-name">${task.name}</div>
+                <div class="modal-task-time">${formatDuration(taskSeconds)}</div>
             `;
 
             item.addEventListener('click', () => {

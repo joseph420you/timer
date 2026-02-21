@@ -350,10 +350,8 @@ class UI {
             item.className = 'modal-task-item';
             item.innerHTML = `
                 <span class="task-color-bar" style="background-color: ${task.color}"></span>
-                <div class="modal-task-info">
-                    <div class="modal-task-name">${task.name}</div>
-                    <div class="modal-task-time">${formatDuration(taskSeconds)}</div>
-                </div>
+                <div class="modal-task-name">${task.name}</div>
+                <div class="modal-task-time">${formatDuration(taskSeconds)}</div>
             `;
 
             item.addEventListener('click', () => {
