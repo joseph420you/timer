@@ -130,7 +130,7 @@
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    min-width: 200px;
+    min-width: fit-content;
     padding: var(--spacing-md);
     opacity: 0;
     visibility: hidden;
@@ -162,7 +162,7 @@
     font-size: var(--font-sm);
     color: var(--text-tertiary);
     margin-top: var(--spacing-xs);
-    word-break: break-all;
+    white-space: nowrap;
 }
 
 .dropdown-logout-btn {

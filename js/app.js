@@ -567,24 +567,33 @@ const UI = {
         // 設定登入頁面事件
         this.setupLoginPageEvents();
 
+        // 預先隱藏登入頁和 App，由 handleAuthStateChange 決定顯示哪個
+        const loginPage = document.getElementById('login-page');
+        const appContainer = document.getElementById('app');
+        if (loginPage) loginPage.classList.add('hidden');
+        if (appContainer) appContainer.style.display = 'none';
+
         // 監聽認證狀態變化
         if (typeof FirebaseAuth !== 'undefined') {
             FirebaseAuth.onAuthStateChanged((user) => {
                 this.handleAuthStateChange(user);
             });
         } else {
-            // Firebase 未載入，顯示錯誤
-
+            // Firebase 未載入，直接顯示登入頁
+            if (loginPage) loginPage.classList.remove('hidden');
+            this.dismissLoading();
         }
 
         // 計時中離開頁面警告
         window.addEventListener('beforeunload', (e) => {
             if (Timer.isRunning) {
                 e.preventDefault();
-                e.returnValue = '';  // Modern browsers show generic warning
+                e.returnValue = '';
             }
         });
 
+        // 安全逾時：5 秒後無論如何都關閉 Loading
+        setTimeout(() => this.dismissLoading(), 5000);
 
     },
 
@@ -620,28 +629,47 @@ const UI = {
         }
     },
 
-    handleAuthStateChange(user) {
+    async handleAuthStateChange(user) {
         const loginPage = document.getElementById('login-page');
         const appContainer = document.getElementById('app');
 
         if (user) {
-            // 已登入 - 隱藏登入頁面，顯示主介面
+            // 已登入 - 先同步雲端資料（確保首頁顯示正確累積時間）
+            try {
+                await Storage.syncFromCloud();
+            } catch (e) { /* 同步失敗也繼續，用本地資料 */ }
 
-
+            // 資料就緒後才顯示主介面
             if (loginPage) loginPage.classList.add('hidden');
             if (appContainer) appContainer.style.display = 'block';
 
-            // 初始化主介面
+            // 初始化主介面（此時 updateHomePage 讀到的是已同步的資料）
             this.initMainApp();
         } else {
             // 未登入 - 顯示登入頁面，隱藏主介面
-
-
             if (loginPage) loginPage.classList.remove('hidden');
             if (appContainer) appContainer.style.display = 'none';
 
             // 重置登入按鈕狀態
             this.resetLoginButton();
+        }
+
+        // 等待字體載入完成
+        try {
+            await document.fonts.ready;
+        } catch (e) { /* ignore */ }
+
+        // 等兩幀讓瀏覽器完成渲染（確保畫面上的數字已經是正確的）
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        this.dismissLoading();
+    },
+
+    dismissLoading() {
+        const loader = document.getElementById('app-loading');
+        if (loader && !loader.classList.contains('fade-out')) {
+            loader.classList.add('fade-out');
+            setTimeout(() => loader.remove(), 500);
         }
     },
 
@@ -2033,6 +2061,6 @@ Storage.updateRecord = async function (dateStr, recordId, updates) {
 
 // ========== 啟動應用程式 ==========
 document.addEventListener('DOMContentLoaded', function () {
+    // 初始化 App — Loading 畫面由 handleAuthStateChange 負責關閉
     UI.init();
-    Timer.restoreState();
 });

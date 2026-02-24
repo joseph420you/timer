@@ -23,6 +23,92 @@
 </head>
 
 <body>
+    <!-- Loading Overlay — 等待字體和資料載入 -->
+    <div id="app-loading" style="
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: linear-gradient(160deg, #0B0F19 0%, #0F172A 50%, #0B0F19 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        transition: opacity 0.4s ease, visibility 0.4s ease;
+    ">
+        <!-- 進度條容器 -->
+        <div style="
+            width: 260px;
+            height: 22px;
+            border-radius: 12px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            overflow: hidden;
+            position: relative;
+        ">
+            <!-- 斜線動畫條 -->
+            <div style="
+                position: absolute;
+                inset: 2px;
+                border-radius: 10px;
+                background: linear-gradient(135deg, #3B82F6 0%, #6366F1 40%, #FB923C 100%);
+                background-size: 200% 100%;
+                animation: loadingShimmer 2s ease-in-out infinite;
+            "></div>
+            <!-- 斜線紋理 -->
+            <div style="
+                position: absolute;
+                inset: 2px;
+                border-radius: 10px;
+                background: repeating-linear-gradient(
+                    -55deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(255,255,255,0.12) 8px,
+                    rgba(255,255,255,0.12) 16px
+                );
+                background-size: 32px 32px;
+                animation: loadingStripes 0.8s linear infinite;
+            "></div>
+        </div>
+        <!-- LOADING 文字 -->
+        <div style="
+            font-family: -apple-system, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: rgba(148, 163, 184, 0.8);
+        ">LOADING......</div>
+    </div>
+
+    <style>
+        @keyframes loadingStripes {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 32px 0;
+            }
+        }
+
+        @keyframes loadingShimmer {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        #app-loading.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+    </style>
+
     <!-- 登入頁面（未登入時顯示） -->
     <div id="login-page" class="login-page">
         <div class="login-container">

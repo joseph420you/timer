@@ -150,6 +150,7 @@
     justify-content: space-between;
     padding: 70px 0 50px 0;
     z-index: 2;
+    overflow: hidden;
     /* 藍色光暈發光效果 */
     box-shadow:
         0 0 30px rgba(59, 130, 246, 0.2),
@@ -172,7 +173,7 @@
     transform: translate(-50%, -50%);
     width: 100%;
     text-align: center;
-    font-size: 66px;
+    font-size: 55px;
     font-weight: 300;
     letter-spacing: 2px;
     line-height: 1;
@@ -427,7 +428,7 @@
     padding-left: 12px;
     font-size: var(--font-xs);
     color: var(--text-tertiary);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .timeline-bars {
@@ -926,7 +927,7 @@
 
 @media (max-width: 374px) {
     .total-time {
-        font-size: 66px;
+        font-size: 48px;
     }
 
     .running-timer {
