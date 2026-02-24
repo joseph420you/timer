@@ -16,13 +16,27 @@ body {
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
-    background-color: var(--bg-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--gradient-bg);
+    background-attachment: fixed;
     color: var(--text-primary);
     font-size: var(--font-md);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* 底部光暈氛圍 */
+body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: var(--gradient-glow);
+    pointer-events: none;
+    z-index: 0;
 }
 
 #app {
@@ -33,6 +47,7 @@ body {
     max-height: 100dvh;
     position: relative;
     overflow: hidden;
+    z-index: 1;
 }
 
 /* 頁面管理 */
@@ -90,7 +105,7 @@ svg {
     flex-shrink: 0;
 }
 
-/* 滾動條樣式 */
+/* 滾動條樣式 — 深藍主題 */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -106,7 +121,7 @@ svg {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
+    background: #334155;
 }
 
 /* 通用工具類 */
