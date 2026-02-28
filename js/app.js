@@ -1359,9 +1359,6 @@ const UI = {
         // 使用非同步方式載入記錄
         const records = await Storage.getRecordsByDateAsync(date);
 
-        // Get actual hour row height for RWD support
-        const hourHeight = hoursDiv.querySelector('.timeline-hour')?.offsetHeight || 40;
-
         records.forEach(record => {
             // 優先使用記錄中的快照資訊，保證歷史記錄正確顯示
             const taskColor = record.taskColor || '#888';
@@ -1397,8 +1394,8 @@ const UI = {
                 const secondsLeftInHour = (60 * 60) - secondsFromHourStart; // Seconds until next hour
                 const secondsInThisHour = Math.min(secondsLeftInHour, remainingSeconds);
 
-                // Position: which hour row (top), and where in the 60-minute span (left)
-                bar.style.top = `${currentHour * hourHeight}px`;  // Responsive position based on hour
+                // Position: percentage-based for RWD support (adapts to CSS media query height changes)
+                bar.style.top = `${(currentHour / 24) * 100}%`;
                 bar.style.left = `${(minuteInHour / 60) * 100}%`;  // Position within the hour (precise)
                 bar.style.width = `${((secondsInThisHour / 60) / 60) * 100}%`;  // Width based on duration (precise)
                 bar.style.cursor = 'pointer';

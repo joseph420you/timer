@@ -237,7 +237,7 @@
 .start-btn {
     padding: var(--spacing-md) var(--spacing-2xl);
     background: rgba(18, 26, 42, 0.85);
-    border: 1px solid rgba(99, 102, 241, 0.3);
+    border: 2px solid rgba(99, 102, 241, 0.3);
     color: transparent;
     /* 原始文字隱藏 */
     font-size: var(--font-lg);
@@ -327,10 +327,10 @@
 
 .cancel-btn {
     padding: var(--spacing-md) var(--spacing-xl);
-    background-color: transparent;
+    background-color: rgba(59, 130, 246, 0.1);
     color: var(--text-secondary);
     font-size: var(--font-md);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-lg);
     transition: all var(--transition-fast);
 }
@@ -434,8 +434,8 @@
 .timeline-bars {
     margin-left: 50px;
     position: relative;
-    height: 960px;
-    /* 24 小時 * 40px */
+    height: calc(24 * 40px);
+    /* 24 小時 * 40px，與 timeline-hours 同步 */
     z-index: 1;
 }
 

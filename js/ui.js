@@ -472,7 +472,7 @@ class UI {
         // 創建記錄條
         const barsDiv = document.createElement('div');
         barsDiv.className = 'timeline-bars';
-        barsDiv.style.height = `${24 * 40}px`; // 每小時40px
+        // Height controlled by CSS for RWD support
 
         const records = getRecordsByDate(date);
 
