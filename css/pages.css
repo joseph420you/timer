@@ -173,7 +173,7 @@
     transform: translate(-50%, -50%);
     width: 100%;
     text-align: center;
-    font-size: 55px;
+    font-size: 50px;
     font-weight: 300;
     letter-spacing: 2px;
     line-height: 1;
@@ -196,9 +196,7 @@
     outline: none;
 }
 
-.task-selector:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-}
+
 
 .task-name {
     font-size: 16px;
