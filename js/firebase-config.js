@@ -258,6 +258,26 @@ const FirestoreDB = {
         return await this.saveDailyRecord(dateStr, dailyRecord);
     },
 
+    // 更新指定日期的指定記錄 (例如編輯時間)
+    async updateRecord(dateStr, recordId, updates) {
+        let dailyRecord = await this.getDailyRecord(dateStr);
+        if (!dailyRecord) return false;
+
+        const index = dailyRecord.records.findIndex(r => r.id === recordId);
+        if (index === -1) return false;
+
+        // 套用更新，保留原本資訊
+        dailyRecord.records[index] = { ...dailyRecord.records[index], ...updates };
+
+        // 重新計算這筆記錄的 duration
+        if (updates.startTime && updates.endTime) {
+            dailyRecord.records[index].duration = Math.floor((updates.endTime - updates.startTime) / 1000);
+        }
+
+        // 傳回儲存結果
+        return await this.saveDailyRecord(dateStr, dailyRecord);
+    },
+
     // 取得日期範圍內有記錄的日期列表（用於日曆顯示）
     async getRecordedDates(startDate, endDate) {
         const userPath = this.getUserPath();
